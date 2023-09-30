@@ -1,21 +1,140 @@
-<!doctype HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-	<title>システム工学特論</title>
-	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
-	<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Document</title>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 
 <body style='margin:0px; overflow:hidden;'>
-	<a-scene embedded arjs>
-    	<a-marker preset="hiro">  
-     		<a-box position="0 1 0" ></a-box>
-    		<a-text value="TEST" position="0 0 0" align="center"></a-text>
-    	</a-marker>
-     
-     	<a-entity camera></a-entity>
-     
+    <a-scene embedded arjs="debugUIEnabled:false;" vr-mode-ui="enabled: false">
+        <a-assets>
+            <a-asset-item id="bowser" src="bowser/scene.gltf"></a-asset-item>
+        </a-assets>
+
+        <!-- 北 -->
+        <a-marker preset="custom" type="pattern" url="markers/pattern-1.patt">
+            <a-image id="north" src="images/195x415.png" height="4.15" width="1.95" rotation="-90 0 0"></a-image>
+        </a-marker>
+
+        <!-- 南 -->
+        <a-marker preset="custom" type="pattern" url="markers/pattern-2.patt">
+            <a-image id="south" src="images/195x415.png" height="4.15" width="1.95" rotation="-90 0 0"></a-image>
+        </a-marker>
+
+        <!-- 東 -->
+        <a-marker preset="custom" type="pattern" url="markers/pattern-3.patt">
+            <a-image id="east" src="images/125x415.png" height="4.15" width="1.25" rotation="-90 0 0"></a-image>
+        </a-marker>
+
+        <!-- 西 -->
+        <a-marker preset="custom" type="pattern" url="markers/pattern-4.patt">
+            <a-image id="west" src="images/125x415.png" height="4.15" width="1.25" rotation="-90 0 0"></a-image>
+            <a-entity id="#bowser-model" gltf-model="#bowser" position="0 1 0" rotation="-90 0 0"
+                scale="0.05 0.05 0.05"></a-entity>
+        </a-marker>
+
+        <!-- 天 -->
+        <a-marker preset="custom" type="pattern" url="markers/pattern-5.patt">
+            <a-image id="top" src="images/195x125.png" height="1.25" width="1.95" rotation="-90 0 0"></a-image>
+        </a-marker>
+
+        <a-entity camera></a-entity>
     </a-scene>
+
+    <div class="modal">
+        <div class="controls">
+            <div style="display: flex;">
+                <p>内容量</p>
+                <input type="range" min="0" max="100" step="10">
+            </div>
+            <form id="content-switch">
+
+                <label for="oculus">
+                    <input type="radio" name="content-switch" value="oculus" checked>
+                    Oculus
+                </label>
+
+                <label for="hololens">
+                    <input type="radio" name="content-switch" value="hololens">
+                    Hololens
+                </label>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .modal {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        .controls {
+            display: flex;
+            width: 100%;
+            padding: 16px;
+        }
+    </style>
+    <script>
+        const images = {
+            oculus: {
+                top: 'images/oculus/top.png',
+                north: 'images/oculus/north.png',
+                south: 'images/oculus/south.png',
+                east: 'images/oculus/east.png',
+                west: 'images/oculus/west.png',
+            },
+            hololense: {
+                top: 'images/hololense/top.png',
+                north: 'images/hololense/north.png',
+                south: 'images/hololense/south.png',
+                east: 'images/hololense/east.png',
+                west: 'images/hololense/west.png',
+            }
+        }
+
+        function setImages(type) {
+            const top = document.getElementById('top');
+            const north = document.getElementById('north');
+            const south = document.getElementById('south');
+            const east = document.getElementById('east');
+            const west = document.getElementById("west");
+
+            top.setAttribute('src', images[type].top);
+            north.setAttribute('src', images[type].north);
+            south.setAttribute('src', images[type].south);
+            east.setAttribute('src', images[type].east);
+            west.setAttribute('src', images[type].west);
+        }
+
+        setImages('oculus');
+
+        const modal = document.querySelector('.modal');
+        const controls = document.querySelector('.controls');
+        const range = document.querySelector('input[type="range"]');
+
+        range.addEventListener('input', (e) => {
+            const bowser = document.getElementById('#bowser-model');
+            bowser.setAttribute('position', `0 1 ${2 - 4 * (e.target.value / 100)}`);
+        });
+
+        document.getElementById("content-switch").addEventListener('change', (e) => {
+            const bowser = document.getElementById('#bowser-model');
+            if (e.target.value === 'oculus') {
+                setImages('oculus');
+            } else {
+                setImages('hololense');
+            }
+            document.getElementById('top-text').setAttribute('value', `認識物体：${e.target.value}`);
+        });
+    </script>
 </body>
 
 </html>
